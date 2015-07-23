@@ -44,31 +44,16 @@ var marketCapFloat = function(marketCapString) {
 
 var csv2console = function(csvfile, headers) {
     console.log(headers.join("\t"));
-    var parser = csv.parse(); //create parser
-
-    parser.on('readable', function(){
-	while(row = parser.read()){
-	    var shares = Math.round(marketCapFloat(row[2])/row[3], 0);
-	    var eps = (row[3]/row[4]).toFixed(3);
-	    var earnings = accounting.formatMoney(eps * shares);
-	    outrow = row.concat([shares, eps, earnings]);
-	    console.log(outrow.join("\t"));
-	    }
-	});
-
-    parser.on('error', function(err){   //error handler
-	console.log(err.message);
-	});
-
-// now that we've defined what happens kickoff the parser
-    fs.createReadStream(csvfile).pipe(parser);
+    csv
+    .from.path(csvfile)
+    .on('record', function(row, index) {
+        var shares = Math.round(marketCapFloat(row[2])/row[3], 0);
+        var eps = (row[3]/row[4]).toFixed(3);
+        var earnings = accounting.formatMoney(eps * shares);
+        outrow = row.concat([shares, eps, earnings]);
+        console.log(outrow.join("\t"));
+    });
 };
-
-
-
-
-
-
 
 var buildfn = function(csvfile, headers) {
     var response2console = function(result, response) {
